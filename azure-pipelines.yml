@@ -87,7 +87,7 @@ stages:
       eq(variables['Build.SourceBranchName'], variables['releaseBranchName'])
     )
   jobs:
-  - deployment: Deploy to dev
+  - deployment: Deploy
     pool:
       vmImage: 'ubuntu-20.04'
     environment: dev
@@ -116,7 +116,7 @@ stages:
       eq(variables['Build.SourceBranchName'], variables['releaseBranchName'])
     )
   jobs:
-  - deployment: Deploy to test
+  - deployment: Deploy
     pool:
       vmImage: 'ubuntu-20.04'
     environment: test
@@ -145,7 +145,7 @@ stages:
       eq(variables['Build.SourceBranchName'], variables['releaseBranchName'])
     )
   jobs:
-  - deployment: Deploy to staging
+  - deployment: Deploy
     pool:
       vmImage: 'ubuntu-20.04'
     environment: staging
@@ -174,7 +174,7 @@ stages:
       eq(variables['Build.SourceBranchName'], 'main')
     )
   jobs:
-  - deployment: Deploy to prod
+  - deployment: Deploy
     pool:
       vmImage: 'ubuntu-20.04'
     environment: prod
