@@ -87,7 +87,7 @@ stages:
       eq(variables['Build.SourceBranchName'], variables['releaseBranchName'])
     )
   jobs:
-  - deployment: Deploy
+  - deployment: Deploy to dev
     pool:
       vmImage: 'ubuntu-20.04'
     environment: dev
@@ -116,7 +116,7 @@ stages:
       eq(variables['Build.SourceBranchName'], variables['releaseBranchName'])
     )
   jobs:
-  - deployment: Deploy
+  - deployment: Deploy to test
     pool:
       vmImage: 'ubuntu-20.04'
     environment: test
@@ -138,8 +138,14 @@ stages:
 - stage: 'Staging'
   displayName: 'Deploy to the staging environment'
   dependsOn: Test
+  condition: |
+    and
+    (
+      succeeded(),
+      eq(variables['Build.SourceBranchName'], variables['releaseBranchName'])
+    )
   jobs:
-  - deployment: Deploy
+  - deployment: Deploy to staging
     pool:
       vmImage: 'ubuntu-20.04'
     environment: staging
@@ -156,4 +162,33 @@ stages:
             inputs:
               azureSubscription: 'Resource Manager - Tailspin - Space Game'
               appName: '$(WebAppNameStaging)'
+              package: '$(Pipeline.Workspace)/drop/$(buildConfiguration)/*.zip'
+
+- stage: 'Production'
+  displayName: 'Deploy to the production environment'
+  dependsOn: Staging
+  condition: |
+    and
+    (
+      succeeded(),
+      eq(variables['Build.SourceBranchName'], 'main'])
+    )
+  jobs:
+  - deployment: Deploy to prod
+    pool:
+      vmImage: 'ubuntu-20.04'
+    environment: prod
+    variables:
+    - group: 'Release'
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - download: current
+            artifact: drop
+          - task: AzureWebApp@1
+            displayName: 'Azure App Service Deploy: website'
+            inputs:
+              azureSubscription: 'Resource Manager - Tailspin - Space Game'
+              appName: '$(WebAppNameProd)'
               package: '$(Pipeline.Workspace)/drop/$(buildConfiguration)/*.zip'
