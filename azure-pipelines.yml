@@ -171,7 +171,7 @@ stages:
     and
     (
       succeeded(),
-      eq(variables['Build.SourceBranchName'], 'main'])
+      eq(variables['Build.SourceBranchName'], 'main')
     )
   jobs:
   - deployment: Deploy to prod
